@@ -1,3 +1,16 @@
+@font-face {
+	font-family: "Wantgov2 Book";
+	src: url("fonts/wantgo-v2.ttf");
+}
+@font-face {
+	font-family: "Open Sans";
+	src: url("fonts/OpenSans-Bold.ttf");
+}
+@font-face {
+	font-family: "Varela Round";
+	src: url("fonts/VarelaRound-Bold.TTF");
+}
+
 *  {
 	margin: 0px;
 }
@@ -92,6 +105,8 @@ html, body {
 
 	line-height: 60px;
 	color: white;
+	font-family: "Open Sans";
+	font-size: 12pt;
 }
 
 /* 左側 */
@@ -112,7 +127,7 @@ html, body {
 	padding-top: 20px;
 	
 	color: white;
-	font-weight: bold;
+	font-family: "Varela Round";
 }
 
 #profile_body {
@@ -125,6 +140,7 @@ html, body {
 	border-width: 1px;
 	border-color: gray;
 	color: white;
+	font-size: small;
 }
 
 #close_button {
@@ -180,6 +196,8 @@ html, body {
 
 	line-height: 100px;
 	font-size: 60px;
+	font-family: "Wantgov2 Book";
+	color: #44515e;
 	text-align: center;
 	border-bottom-style: solid;
 	border-color: lightgray;
