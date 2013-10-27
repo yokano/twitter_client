@@ -39,6 +39,7 @@ func (this *Controller) Handle() {
 	
 	// api
 	table["/get_timeline"] = (*Controller).GetTimeline
+	table["/get_account"] = (*Controller).GetAccount
 	
 	for url, callback := range table {
 		http.HandleFunc(url, this.GetHandler(callback))
