@@ -96,6 +96,8 @@ html, body {
 	
 	float: left;
 	background-image: url("img/user_logo.png");
+	background-position: center;
+	background-size: contain;
 }
 
 #user_name {
@@ -269,10 +271,13 @@ html, body {
 
 .tweet_icon {
 	width: 83px;
-	height: 83px;
-	
+	height: 83px;	
 	float: left;
-	background-image: url("img/tweet_icon.png");
+}
+
+.tweet_icon img {
+	width: 83px;
+	height: 83px;
 }
 
 .tweet_buttons {
