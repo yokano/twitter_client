@@ -259,6 +259,53 @@ func Request(c appengine.Context, method string, targetUrl string, params map[st
 }
 
 /**
+ * Getリクエストを送る
+ * @function
+ * @param {appengine.Context} c コンテキスト
+ * @param {string} targetUrl 送信先
+ * @param {map[string]string} query クエリリスト
+ * @param {map[string]string} header ヘッダー
+ * @returns {*http.Response} レスポンス
+ */
+func Get(c appengine.Context, targetUrl string, query map[string]string, header map[string]string) *http.Response {
+	var request *http.Request
+	var err error
+	
+	// クエリ埋め込み
+	if query != nil || len(query) > 0 {
+		paramStrings := make([]string, 0)
+		for key, value := range query {
+			param := strings.Join([]string{key, value}, "=")
+			paramStrings = append(paramStrings, param)
+		}
+		paramString := ""
+		if len(query) == 1 {
+			paramString = paramStrings[0]
+		} else {
+			paramString = strings.Join(paramStrings, "&")
+		}
+		targetUrl = strings.Join([]string{targetUrl, paramString}, "?")
+	}
+	
+	// リクエスト作成
+	request, err = http.NewRequest("GET", targetUrl, nil)
+	Check(c, err)
+	
+	// ヘッダー設定
+	if header != nil || len(header) > 0 {
+		for key, value := range header {
+			request.Header.Add(key, value)
+		}
+	}
+	
+	// 送受信
+	client := urlfetch.Client(c)
+	response, err := client.Do(request)
+	Check(c, err)
+	
+	return response}
+
+/**
  * ランダムな文字列を取得する
  * 64bit のランダムデータを Base64 エンコードして記号を抜いたもの
  * @function

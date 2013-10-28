@@ -7,6 +7,7 @@ import (
 	"strings"
 	. "server/lib"
 	. "server/view"
+	config "server/config"
 )
 
 // Twitter ボタンが押された時の処理
@@ -30,20 +31,15 @@ func (this *Controller) CallbackTwitter(w http.ResponseWriter, r *http.Request) 
 	
 	if result["oauth_token"] != "" {
 		result["screen_name"] = strings.Trim(result["screen_name"], "\x00")
-		
-		// ログイン成功
-//		params := make(map[string]string, 4)
-//		params["user_type"] = "Twitter"
-//		params["user_name"] = result["screen_name"]
-//		params["user_oauth_id"] = result["user_id"]
-//		params["user_pass"] = ""
 
-//		toURL := "https://api.twitter.com/1.1/statuses/user_timeline.json"
-//		oauth.Request("GET", toURL, Join("screen_name=", "yuta_okano"))
+		// ログイン成功したらタイムライン読み出し
+		params := make(map[string]string, 0)
+		params["screen_name"] = result["screen_name"]
+		params["oauth_token"] = result["oauth_token"]
+		toURL := "https://api.twitter.com/1.1/statuses/user_timeline.json"
+		oauth.Request("GET", toURL, params, "", []string{config.TWITTER_CONSUMER_SECRET, result["oauth_token_secret"]})
 
-		view.Login()
-		
-		fmt.Fprintf(w, "RESULT: %#v", result)
+		view.TimeLine()
 	} else {
 		// ログイン失敗
 		view.Login()
