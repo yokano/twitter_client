@@ -60,7 +60,7 @@ func NewOAuth1(c appengine.Context, callback string) *OAuth1 {
  * @returns {map[string]string} リクエスト結果
  */
 func (this *OAuth1) RequestToken(targetUrl string) map[string]string {
-	response := this.Request(targetUrl, "")
+	response := this.Request("POST", targetUrl, "")
 	datas := strings.Split(response, "&")
 	result := make(map[string]string, len(datas))
 	for i := 0; i < len(datas); i++ {
@@ -76,18 +76,12 @@ func (this *OAuth1) RequestToken(targetUrl string) map[string]string {
  * メソッドは POST 固定
  * @method
  * @memberof OAuth1
+ * @param {string} method POSTかGET
  * @param {string} targetUrl 送信先
  * @param {string} body リクエストボディ
  * @returns {string} レスポンス
  */
-func (this *OAuth1) Request(targetUrl string, body string) string {
-	// 認証用にパラメータを追加
-	this.context.Debugf("body: %#v", body)
-	p := strings.Split(body, "=")
-	this.context.Debugf("p: %#v", p)
-	if body != "" {
-		this.params[p[0]] = p[1]
-	}
+func (this *OAuth1) Request(method string, targetUrl string, body string) string {
 
 	// リクエストごとに変わるパラメータを設定
 	this.params["oauth_nonce"] = this.CreateNonce()
@@ -97,7 +91,7 @@ func (this *OAuth1) Request(targetUrl string, body string) string {
 	// リクエスト送信
 	params := make(map[string]string, 1)
 	params["Authorization"] = this.CreateHeader()
-	response := Request(this.context, "POST", targetUrl, params, body)
+	response := Request(this.context, method, targetUrl, params, body)
 	
 	// レスポンスボディの読み取り
 	result := make([]byte, 2048)
@@ -130,9 +124,6 @@ func (this *OAuth1) CreateNonce() string {
 func (this *OAuth1) CreateHeader() string {
 	params := make([]string, 0)
 	for key, val := range this.params {
-		if key == "screen_name" {
-			continue
-		}
 		key = url.QueryEscape(key)
 		val = url.QueryEscape(val)
 		set := fmt.Sprintf(`%s="%s"`, key, val)
@@ -162,7 +153,6 @@ func (this *OAuth1) CreateSignature(targetUrl string) string {
 		key := keys[i]
 		val := this.params[key]
 		params[i] = fmt.Sprintf("%s=%s", url.QueryEscape(key), url.QueryEscape(val))
-		this.context.Debugf("Signature:%#v", params[i])
 	}
 	paramString := strings.Join(params, "&")
 	baseString := fmt.Sprintf("POST&%s&%s", url.QueryEscape(targetUrl), url.QueryEscape(paramString))
@@ -201,7 +191,7 @@ func (this *OAuth1) Authenticate(w http.ResponseWriter, r *http.Request, targetU
 func (this *OAuth1) ExchangeToken(token string, verifier string, targetUrl string) map[string]string {
 	this.params["oauth_token"] = token
 	body := fmt.Sprintf("oauth_verifier=%s", verifier)
-	response := this.Request(targetUrl, body)
+	response := this.Request("POST", targetUrl, body)
 	
 	datas := strings.Split(response, "&")
 	result := make(map[string]string, len(datas))

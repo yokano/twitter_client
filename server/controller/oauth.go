@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"appengine"
 	"fmt"
+	"strings"
 	. "server/lib"
 	. "server/view"
 )
@@ -28,20 +29,21 @@ func (this *Controller) CallbackTwitter(w http.ResponseWriter, r *http.Request) 
 	view := NewView(c, w)
 	
 	if result["oauth_token"] != "" {
-		// ログイン成功
-		params := make(map[string]string, 4)
-		params["user_type"] = "Twitter"
-		params["user_name"] = result["screen_name"]
-		params["user_oauth_id"] = result["user_id"]
-		params["user_pass"] = ""
+		result["screen_name"] = strings.Trim(result["screen_name"], "\x00")
 		
-		toURL := "https://api.twitter.com/1.1/statuses/user_timeline.json"
-		c.Debugf("JOIN: %#v", Join("screen_name=", "yuta_okano"))
-		result := oauth.Request(toURL, Join("screen_name=", "yuta_okano"))
+		// ログイン成功
+//		params := make(map[string]string, 4)
+//		params["user_type"] = "Twitter"
+//		params["user_name"] = result["screen_name"]
+//		params["user_oauth_id"] = result["user_id"]
+//		params["user_pass"] = ""
+
+//		toURL := "https://api.twitter.com/1.1/statuses/user_timeline.json"
+//		oauth.Request("GET", toURL, Join("screen_name=", "yuta_okano"))
 
 		view.Login()
-		fmt.Fprintf(w, result)
-		fmt.Fprintf(w, Join("<br>screen_name=", params["user_name"]))
+		
+		fmt.Fprintf(w, "RESULT: %#v", result)
 	} else {
 		// ログイン失敗
 		view.Login()
