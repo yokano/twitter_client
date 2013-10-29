@@ -31,7 +31,6 @@ func (this *Controller) Handle() {
 	
 	// page
 	table["/"] = (*Controller).Top
-	table["/timeline"] = (*Controller).TimeLine
 	
 	// oauth
 	table["/login_twitter"] = (*Controller).LoginTwitter
@@ -40,6 +39,7 @@ func (this *Controller) Handle() {
 	// api
 	table["/get_timeline"] = (*Controller).GetTimeline
 	table["/get_account"] = (*Controller).GetAccount
+	table["/logout"] = (*Controller).Logout
 	
 	for url, callback := range table {
 		http.HandleFunc(url, this.GetHandler(callback))

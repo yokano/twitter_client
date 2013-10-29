@@ -103,17 +103,23 @@ func (this *OAuth1) Request(method string, targetUrl string, params map[string]s
 	var response *http.Response
 	if method == "GET" {
 		query := make(map[string]string, 0)
-		query["screen_name"] = oauthParams["screen_name"]
+		for key, val := range params {
+			if key != "oauth_token" {
+				query[key] = val
+			}
+		}
 		response = Get(this.context, targetUrl, query, httpParams)
 	} else {
 		response = Request(this.context, method, targetUrl, httpParams, body)
 	}
 	
 	// レスポンスボディの読み取り
-	result := make([]byte, 2048)
+	result := make([]byte, 1024 * 1024)
 	response.Body.Read(result)
+	resultString := string(result)
+	resultString = strings.Trim(resultString, "\x00")
 	
-	return string(result)
+	return resultString
 }
 
 /**

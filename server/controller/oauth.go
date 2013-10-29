@@ -7,7 +7,6 @@ import (
 	"strings"
 	. "server/lib"
 	. "server/view"
-	config "server/config"
 )
 
 // Twitter ボタンが押された時の処理
@@ -26,20 +25,18 @@ func (this *Controller) CallbackTwitter(w http.ResponseWriter, r *http.Request) 
 	
 	oauth := NewOAuth1(c, "http://okatter-client.appspot.com/callback")
 	result := oauth.ExchangeToken(token, verifier, "https://api.twitter.com/oauth/access_token")
-	
 	view := NewView(c, w)
 	
+	// ログイン成功
 	if result["oauth_token"] != "" {
 		result["screen_name"] = strings.Trim(result["screen_name"], "\x00")
 
-		// ログイン成功したらタイムライン読み出し
-		params := make(map[string]string, 0)
-		params["screen_name"] = result["screen_name"]
-		params["oauth_token"] = result["oauth_token"]
-		toURL := "https://api.twitter.com/1.1/statuses/user_timeline.json"
-		oauth.Request("GET", toURL, params, "", []string{config.TWITTER_CONSUMER_SECRET, result["oauth_token_secret"]})
+		// セッション開始
+		this.StartSession(w, r, result["oauth_token"], result["oauth_token_secret"])
 
-		view.TimeLine()
+		// トップページへリダイレクト
+		http.Redirect(w, r, "/", 302)
+
 	} else {
 		// ログイン失敗
 		view.Login()
